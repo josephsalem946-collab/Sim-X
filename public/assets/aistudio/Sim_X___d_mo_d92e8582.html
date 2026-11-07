@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sim X – démo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
+<style>
+:root{--bg:#F1F5FA;--sf:#fff;--ink:#0C1B33;--mut:#4C5B76;--ln:#D6DEEB;--pri:#1237C8;--pri2:#0A2A8F;--onp:#fff;--red:#C20F31;--ok:#0B7A5B;--foc:#B54708;--sh:0 1px 2px rgba(12,27,51,.08),0 10px 30px rgba(12,27,51,.10);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#09111F;--sf:#111B33;--ink:#EAF0FF;--mut:#AAB8DA;--ln:#28365F;--pri:#7C97FF;--onp:#08112A;--red:#FF7B93;--ok:#4FD1A5;--foc:#FFC46B;--sh:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.45)}}
+:root[data-theme="dark"]{--bg:#09111F;--sf:#111B33;--ink:#EAF0FF;--mut:#AAB8DA;--ln:#28365F;--pri:#7C97FF;--onp:#08112A;--red:#FF7B93;--ok:#4FD1A5;--foc:#FFC46B;--sh:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0}html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--foc);outline-offset:2px}
+#app{max-width:560px;margin:0 auto;padding:12px 16px 40px}
+.top{display:flex;align-items:center;gap:10px;padding:6px 0 10px}
+.ib{width:46px;height:46px;flex:none;border-radius:14px;border:1px solid var(--ln);background:var(--sf);display:grid;place-items:center;font-size:20px}
+.brand{font:800 26px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.03em;flex:1}.brand b{color:var(--pri)}
+.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--ln);background:var(--sf);border-radius:99px;padding:4px 6px 4px 14px;font-weight:700;min-height:46px}
+.chip button{width:36px;height:36px;border:0;border-radius:50%;background:transparent;font-size:17px}
+.tag{color:var(--mut);margin:2px 0 14px;max-width:34ch}
+.demo{font-size:13px;color:var(--mut);margin:0 0 14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px}.tabs button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--ln);background:var(--sf);font-weight:600}
+.tabs [aria-selected=true]{background:var(--pri);color:var(--onp);border-color:transparent}
+.list{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:2px 14px}
+.row{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:10px 0;background:none;border:0;border-bottom:1px solid var(--ln);text-align:start}.row:last-child{border:0}
+.row .g{flex:1;min-width:0}.fl{font-size:28px}.m2{font-size:13px;color:var(--mut)}
+.empty{padding:22px 4px;color:var(--mut)}
+/* La carte SIM : l'élément mémorable (angle biseauté, puce dorée) */
+.sim{position:relative;display:block;width:100%;text-align:start;margin:10px 0;padding:14px 16px 14px 66px;min-height:84px;border:0;color:#fff;background:linear-gradient(135deg,#1A45E0,#0A2A8F);border-radius:14px;clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,0 100%)}
+.sim::before{content:"";position:absolute;inset-inline-start:16px;top:50%;translate:0 -50%;width:34px;height:26px;border-radius:6px;background:linear-gradient(135deg,#F6D77A,#C9A227);box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),inset 0 9px 0 -8px rgba(0,0,0,.3)}
+.sim b{font-size:17px}.sim .m2{color:#D4DDFB}
+/* clip-path coupe les contours : sélection et focus sont dessinés À L'INTÉRIEUR (ombre interne + coche) */
+.sim:focus-visible{outline:none;box-shadow:inset 0 0 0 4px #FFC46B}.sim[aria-checked=true]{box-shadow:inset 0 0 0 3px #FFC46B}.sim[aria-checked=true]::after{content:"✓";position:absolute;inset-inline-end:14px;bottom:10px;width:24px;height:24px;border-radius:50%;background:#FFC46B;color:#0C1B33;font-weight:800;display:grid;place-items:center}
+.sim .pr{position:absolute;inset-inline-end:34px;top:14px;font-weight:800}
+.btn{width:100%;min-height:48px;margin-top:10px;border:0;border-radius:12px;background:var(--pri);color:var(--onp);font-weight:700}.btn.s{background:transparent;color:var(--pri);border:1px solid var(--ln)}.btn:disabled{opacity:.5}
+.ov{position:fixed;inset:0;background:rgba(5,10,25,.6);display:none;z-index:30}.ov.on{display:block}
+.sheet{position:absolute;inset-inline:0;bottom:0;max-width:560px;margin:0 auto;max-height:90%;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:var(--sh)}
+.sheet h2{font:800 22px/1.15 "Bricolage Grotesque",system-ui,sans-serif;margin-bottom:6px}
+.dr{position:fixed;inset-block:0;inset-inline-start:0;width:min(86vw,320px);background:var(--sf);z-index:40;transform:translateX(-105%);transition:transform .22s ease;padding:calc(14px + env(safe-area-inset-top,0px)) 12px 16px;overflow:auto;box-shadow:var(--sh);border-inline-end:1px solid var(--ln)}
+[dir=rtl] .dr{transform:translateX(105%)}.dr.on{transform:none}
+.dr h2{font:800 22px "Bricolage Grotesque",system-ui,sans-serif;padding:4px 8px 10px}
+.dr button.it{display:flex;gap:12px;align-items:center;width:100%;min-height:48px;padding:0 12px;border:0;border-radius:12px;background:none;text-align:start}.dr button.it:hover{background:var(--bg)}
+.dr hr{border:0;border-top:1px solid var(--ln);margin:8px 0}.dr label{display:block;padding:6px 12px;font-size:13px;color:var(--mut)}
+.dr select{width:100%;min-height:44px;margin-top:4px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);padding:0 10px}
+#toast{position:fixed;inset-inline:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:420px;margin:0 auto;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;font-weight:600;display:none;z-index:60}
+code{display:block;word-break:break-all;background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:10px;font-size:13px;margin:6px 0}
+.qr{display:grid;place-items:center;background:#fff;border-radius:14px;padding:6px;margin:10px auto;width:fit-content}.qr svg{display:block;width:200px;height:200px}
+ol{padding-inline-start:20px;margin:8px 0}li{margin:4px 0}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-inline-end-color:transparent;border-radius:50%;vertical-align:-2px;margin-inline-end:8px;animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.dr{transition:none}.spin{animation:none}}
+@media(forced-colors:active){.sim{border:1px solid CanvasText}.chip,.list,.ib{border:1px solid CanvasText}}
+</style></head>
+<body>
+<div id="app">
+ <div class="top"><button class="ib" id="menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="dr"><span aria-hidden="true">☰</span></button><div class="brand">Sim<b>X</b></div>
+  <div class="chip"><span id="bal" aria-live="polite"></span><button id="eye"></button></div></div>
+ <p class="tag" id="tag"></p><p class="demo" id="demo"></p>
+ <div class="tabs" role="tablist" id="tabs"></div><div id="view"></div>
+</div>
+<nav class="dr" id="dr" role="dialog" aria-modal="true" aria-hidden="true"></nav>
+<div class="ov" id="ov"></div><div class="ov" id="md"><div class="sheet" id="sh" role="dialog" aria-modal="true"></div></div><div id="toast" role="status"></div>
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s),H=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const D={
+fr:{tag:"L’internet de vos voyages, depuis Haïti et la diaspora.",demo:"Démo : données fictives, aucun paiement réel.",menu:"Menu",open:"Ouvrir le menu",close:"Fermer",explore:"Explorer",mine:"Mes eSIM",hist:"Historique",wallet:"Solde et dépôt",from:"À partir de {p}",gb:"{n} Go",days:"{n} jours",buy:"Acheter · {p}",pick:"Choisissez un forfait",bought:"Forfait acheté. Votre eSIM se prépare.",short:"Solde insuffisant : ajoutez des crédits.",none:"Aucune eSIM pour l’instant. Choisissez un pays pour commencer.",prep:"Préparation de votre eSIM…",ready:"Prête à installer",install:"Installer",code:"Code d’activation (ne le partagez avec personne)",copy:"Copier le code",copied:"Code copié",s1:"Réglages › Données cellulaires › Ajouter une eSIM.",s2:"Scannez le QR code, ou saisissez le code à la main.",s3:"Activez la ligne de données et l’itinérance des données.",noqr:"QR indisponible hors ligne : utilisez le code ci-dessous.",dep:"Ajouter des crédits",depnote:"Démo : aucun vrai paiement.",empty:"Rien ici pour l’instant.",lang:"Langue",app:"Installer l’application",appHint:"Sur mobile : menu du navigateur › Ajouter à l’écran d’accueil.",help:"Aide et support",terms:"Règles d’utilisation",priv:"Confidentialité",hide:"Masquer le solde",show:"Afficher le solde",receipt:"Reçu",date:"Date",amount:"Montant",type:"Type",tPlan:"Achat de forfait",tDep:"Dépôt",legal:"Texte juridique disponible dans l’application complète."},
+ht:{tag:"Entènèt vwayaj ou, soti Ayiti ak dyaspora a.",demo:"Demo: done fiktif, pa gen vrè peman.",menu:"Meni",open:"Ouvri meni an",close:"Fèmen",explore:"Eksplore",mine:"eSIM mwen yo",hist:"Istwa",wallet:"Balans ak depo",from:"Soti nan {p}",gb:"{n} Go",days:"{n} jou",buy:"Achte · {p}",pick:"Chwazi yon plan",bought:"Plan an achte. N ap prepare eSIM ou.",short:"Balans pa sifi: ajoute kredi.",none:"Pa gen eSIM pou kounye a. Chwazi yon peyi pou kòmanse.",prep:"N ap prepare eSIM ou…",ready:"Pare pou enstale",install:"Enstale",code:"Kòd aktivasyon (pa pataje l ak pèsonn)",copy:"Kopye kòd la",copied:"Kòd la kopye",s1:"Paramèt › Done selilè › Ajoute yon eSIM.",s2:"Eskane QR kòd la, oswa antre kòd la ak men.",s3:"Aktive liy done a ak wouming done.",noqr:"QR pa disponib san entènèt: itilize kòd ki anba a.",dep:"Ajoute kredi",depnote:"Demo: pa gen vrè peman.",empty:"Pa gen anyen isit la pou kounye a.",lang:"Lang",app:"Enstale aplikasyon an",appHint:"Sou telefòn: meni navigatè a › Ajoute sou ekran dakèy.",help:"Èd ak sipò",terms:"Règ itilizasyon",priv:"Konfidansyalite",hide:"Kache balans lan",show:"Montre balans lan",receipt:"Resi",date:"Dat",amount:"Montan",type:"Tip",tPlan:"Achte plan",tDep:"Depo",legal:"Tèks legal la disponib nan aplikasyon konplè a."},
+en:{tag:"Internet for your trips, from Haiti and the diaspora.",demo:"Demo: fictional data, no real payment.",menu:"Menu",open:"Open menu",close:"Close",explore:"Explore",mine:"My eSIMs",hist:"History",wallet:"Balance and deposit",from:"From {p}",gb:"{n} GB",days:"{n} days",buy:"Buy · {p}",pick:"Choose a plan",bought:"Plan purchased. Your eSIM is being prepared.",short:"Insufficient balance: add credits.",none:"No eSIM yet. Pick a country to start.",prep:"Preparing your eSIM…",ready:"Ready to install",install:"Install",code:"Activation code (share it with no one)",copy:"Copy code",copied:"Code copied",s1:"Settings › Cellular › Add eSIM.",s2:"Scan the QR code, or enter the code by hand.",s3:"Turn on the data line and data roaming.",noqr:"QR unavailable offline: use the code below.",dep:"Add credits",depnote:"Demo: no real payment.",empty:"Nothing here yet.",lang:"Language",app:"Install the app",appHint:"On mobile: browser menu › Add to Home Screen.",help:"Help and support",terms:"Terms of use",priv:"Privacy",hide:"Hide balance",show:"Show balance",receipt:"Receipt",date:"Date",amount:"Amount",type:"Type",tPlan:"Plan purchase",tDep:"Deposit",legal:"Legal text is available in the full app."}};
+const K="simx-demo-v1",def={lang:null,bal:1000,hide:false,tab:"explore",esims:[],tx:[],open:null};
+const auto=()=>{for(const l of navigator.languages||[navigator.language]){const b=String(l).slice(0,2).toLowerCase();if(D[b])return b}return"fr"};
+let S;try{S={...def,...JSON.parse(localStorage.getItem(K)||"{}")}}catch(e){S={...def}}if(!D[S.lang])S.lang=auto();
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const t=(k,v)=>String((D[S.lang]||D.fr)[k]??D.fr[k]??k).replace(/\{(\w+)\}/g,(m,n)=>v&&n in v?v[n]:m);
+// Catalogue de démonstration : prix « fournisseur » en 1/10 000 $, marge de 15 % appliquée en entiers, arrondie au centime supérieur (comme sur le serveur).
+const CAT={HT:[24000,58000,86000],US:[30000,65000,98000],CA:[28000,60000,92000],DO:[26000,62000,90000],FR:[27000,64000,95000],ES:[26000,61000,91000],MX:[29000,66000,99000],BR:[31000,70000,104000],JM:[34000,76000,112000]},PL=[[1,7],[3,30],[5,30]];
+const cents=u=>Math.floor((u*11500+999999)/1000000),money=c=>"$"+(c/100).toFixed(2);
+const plans=cc=>PL.map(([g,d],i)=>({id:cc+i,cc,g,d,c:cents(CAT[cc][i])}));
+const flag=cc=>String.fromCodePoint(...[...cc].map(x=>127397+x.charCodeAt()));
+const cname=cc=>{try{return new Intl.DisplayNames([S.lang,"fr"],{type:"region"}).of(cc)||cc}catch(e){return cc}};
+const pn=p=>t("gb",{n:p.g})+" · "+t("days",{n:p.d});
+let toastT;const toast=m=>{const e=$("#toast");e.textContent=m;e.style.display="block";clearTimeout(toastT);toastT=setTimeout(()=>e.style.display="none",2800)};
+
+/* --- fenêtres et menu latéral --- */
+let lastFocus=null;const FOC='a[href],button:not([disabled]),select,input,[tabindex]:not([tabindex="-1"])';
+function openM(html){lastFocus=document.activeElement;$("#sh").innerHTML=html;$("#md").classList.add("on");$("#app").inert=true;const f=$("#sh").querySelector(FOC);f&&f.focus()}
+function closeM(){$("#md").classList.remove("on");$("#app").inert=false;lastFocus&&lastFocus.focus()}
+function openD(){lastFocus=document.activeElement;drawer();$("#dr").classList.add("on");$("#dr").setAttribute("aria-hidden","false");$("#ov").classList.add("on");$("#menu").setAttribute("aria-expanded","true");$("#app").inert=true;$("#dr").querySelector(FOC).focus()}
+function closeD(back=true){$("#dr").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");$("#ov").classList.remove("on");$("#menu").setAttribute("aria-expanded","false");$("#app").inert=false;back&&$("#menu").focus()}
+function drawer(){const it=(k,ico,id)=>`<button class="it" data-go="${id}"><span aria-hidden="true">${ico}</span>${H(t(k))}</button>`;
+ $("#dr").setAttribute("aria-label",t("menu"));
+ $("#dr").innerHTML=`<h2>${H(t("menu"))}</h2>${it("explore","🌍","explore")}${it("mine","📶","mine")}${it("hist","🧾","hist")}${it("wallet","💰","wallet")}<hr>
+ <label>${H(t("lang"))}<select id="lg">${[["fr","Français"],["ht","Kreyòl Ayisyen"],["en","English"]].map(([c,n])=>`<option value="${c}"${c===S.lang?" selected":""}>${n}</option>`).join("")}</select></label><hr>
+ ${it("app","⬇️","app")}${it("help","🛟","help")}${it("terms","📜","legal")}${it("priv","🔒","legal")}`}
+$("#menu").onclick=()=>($("#dr").classList.contains("on")?closeD():openD());$("#ov").onclick=()=>closeD();
+$("#dr").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(!b)return;const g=b.dataset.go;
+ if(g==="explore"||g==="mine"||g==="hist"){S.tab=g;save();closeD();render()}else{closeD(false);if(g==="wallet")wallet();else if(g==="app")toast(t("appHint"));else if(g==="help")location.href="mailto:supportdisponible@gmail.com";else toast(t("legal"))}});
+$("#dr").addEventListener("change",e=>{if(e.target.id==="lg"){S.lang=e.target.value;save();paint();drawer();$("#lg").focus()}});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){if($("#md").classList.contains("on"))closeM();else if($("#dr").classList.contains("on"))closeD()}
+ if(e.key==="Tab"){const box=$("#md").classList.contains("on")?$("#sh"):$("#dr").classList.contains("on")?$("#dr"):null;if(!box)return;const f=[...box.querySelectorAll(FOC)].filter(x=>x.offsetParent!==null);if(!f.length)return;const a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}});
+let tx0=null;$("#dr").addEventListener("touchstart",e=>tx0=e.touches[0].clientX,{passive:true});$("#dr").addEventListener("touchmove",e=>{if(tx0!==null&&Math.abs(e.touches[0].clientX-tx0)>70){tx0=null;closeD()}},{passive:true});
+$("#md").addEventListener("click",e=>{if(e.target.id==="md")closeM()});
+
+/* --- écrans --- */
+function paint(){document.documentElement.lang=S.lang;$("#tag").textContent=t("tag");$("#demo").textContent=t("demo");$("#menu").setAttribute("aria-label",t("open"));
+ $("#bal").textContent=S.hide?"••••":money(S.bal);$("#eye").textContent=S.hide?"🙈":"👁️";$("#eye").setAttribute("aria-label",t(S.hide?"show":"hide"));$("#eye").setAttribute("aria-pressed",S.hide);
+ $("#tabs").innerHTML=[["explore","explore"],["mine","mine"],["hist","hist"]].map(([k,l])=>`<button role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${H(t(l))}</button>`).join("");render()}
+$("#eye").onclick=()=>{S.hide=!S.hide;save();paint()};
+$("#tabs").onclick=e=>{const b=e.target.closest("[data-tab]");if(b){S.tab=b.dataset.tab;save();paint()}};
+function render(){const v=$("#view");
+ if(S.tab==="explore")v.innerHTML=`<div class="list">${Object.keys(CAT).map(cc=>`<button class="row" data-cc="${cc}"><span class="fl" aria-hidden="true">${flag(cc)}</span><span class="g"><b>${H(cname(cc))}</b><br><span class="m2">${H(t("from",{p:money(plans(cc)[0].c)}))}</span></span><span aria-hidden="true">›</span></button>`).join("")}</div>`;
+ else if(S.tab==="mine")v.innerHTML=S.esims.length?S.esims.map(es=>{const p=es,open=S.open===es.id;return `<div class="sim" style="cursor:default"><b>${flag(p.cc)} ${H(cname(p.cc))}</b><br><span class="m2">${H(pn(p))}</span><br>${es.st==="active"?`<span class="m2">✓ ${H(t("ready"))}</span>`:`<span class="m2"><span class="spin"></span>${H(t("prep"))}</span>`}</div>${es.st==="active"?`<button class="btn s" data-inst="${es.id}" aria-expanded="${open}">${H(t("install"))}</button>${open?inst(es):""}`:""}`}).join(""):`<p class="empty">${H(t("none"))}</p>`;
+ else v.innerHTML=S.tx.length?`<div class="list">${S.tx.map((x,i)=>`<button class="row" data-fi="${i}"><span class="g"><b>${H(x.k==="plan"?pn(x)+" · "+cname(x.cc):t("tDep"))}</b><br><span class="m2">${H(new Date(x.at).toLocaleString(S.lang))}</span></span><b>${x.c<0?"−":"+"}${money(Math.abs(x.c))}</b></button>`).join("")}</div>`:`<p class="empty">${H(t("empty"))}</p>`}
+function inst(es){let q="";try{const g=qrcode(0,"M");g.addData(es.lpa);g.make();q=`<div class="qr" role="img" aria-label="QR">${g.createSvgTag({cellSize:5,margin:2,scalable:true})}</div>`}catch(e){q=`<p class="m2">${H(t("noqr"))}</p>`}
+ return `${q}<p class="m2">${H(t("code"))}</p><code>${H(es.lpa)}</code><button class="btn s" data-cp="${es.id}">${H(t("copy"))}</button><ol><li>${H(t("s1"))}</li><li>${H(t("s2"))}</li><li>${H(t("s3"))}</li></ol>`}
+$("#view").addEventListener("click",e=>{const g=s=>e.target.closest(s);
+ if(g("[data-cc]"))country(g("[data-cc]").dataset.cc);
+ else if(g("[data-inst]")){const id=g("[data-inst]").dataset.inst;S.open=S.open===id?null:id;save();render()}
+ else if(g("[data-cp]")){const es=S.esims.find(x=>x.id===g("[data-cp]").dataset.cp);navigator.clipboard.writeText(es.lpa).then(()=>toast(t("copied")),()=>{})}
+ else if(g("[data-fi]"))fiche(+g("[data-fi]").dataset.fi)});
+let sel=null,cur=null;
+function country(cc){cur=cc;const ps=plans(cc);sel=ps[0].id;plan()}
+function plan(){const ps=plans(cur),p=ps.find(x=>x.id===sel);
+ openM(`<h2>${flag(cur)} ${H(cname(cur))}</h2><p class="m2">${H(t("pick"))}</p><div role="radiogroup">${ps.map(x=>`<button class="sim" role="radio" aria-checked="${x.id===sel}" data-pl="${x.id}"><b>${H(pn(x))}</b><br><span class="m2">4G/5G · Hotspot</span><span class="pr">${money(x.c)}</span></button>`).join("")}</div><button class="btn" data-buy>${H(t("buy",{p:money(p.c)}))}</button><button class="btn s" data-x>${H(t("close"))}</button>`)}
+$("#sh").addEventListener("click",e=>{const g=s=>e.target.closest(s);
+ if(g("[data-pl]")){sel=g("[data-pl]").dataset.pl;plan();$("#sh").querySelector(`[data-pl="${sel}"]`).focus()}
+ else if(g("[data-buy]"))buy();else if(g("[data-x]"))closeM();
+ else if(g("[data-dep]")){const c=+g("[data-dep]").dataset.dep;S.bal+=c;S.tx.unshift({k:"dep",c,at:Date.now()});save();paint();wallet()}});
+let busy=false;
+function buy(){if(busy)return;const p=plans(cur).find(x=>x.id===sel);if(S.bal<p.c){toast(t("short"));closeM();wallet();return}busy=true;
+ S.bal-=p.c;const id="e"+Date.now().toString(36);const lpa="LPA:1$demo.simx.example$"+Math.random().toString(36).slice(2,10).toUpperCase()+"-"+Math.random().toString(36).slice(2,8).toUpperCase();
+ S.esims.unshift({id,cc:p.cc,g:p.g,d:p.d,c:p.c,st:"prov",lpa,at:Date.now()});S.tx.unshift({k:"plan",cc:p.cc,g:p.g,d:p.d,c:-p.c,at:Date.now()});S.tab="mine";S.open=null;save();closeM();paint();toast(t("bought"));setTimeout(()=>{busy=false},400);finish(id,3000)}
+function finish(id,ms){setTimeout(()=>{const es=S.esims.find(x=>x.id===id);if(es&&es.st==="prov"){es.st="active";save();if(S.tab==="mine")render()}},ms)}
+S.esims.filter(x=>x.st==="prov").forEach(x=>finish(x.id,Math.max(300,3000-(Date.now()-x.at))));
+function wallet(){openM(`<h2>${H(t("wallet"))}</h2><p style="font-size:30px;font-weight:800">${S.hide?"••••":money(S.bal)}</p><p class="m2">${H(t("depnote"))}</p>${[500,1000,2500].map(c=>`<button class="btn s" data-dep="${c}">${H(t("dep"))} · ${money(c)}</button>`).join("")}<button class="btn" data-x>${H(t("close"))}</button>`)}
+function fiche(i){const x=S.tx[i];const rows=[[t("type"),x.k==="plan"?t("tPlan"):t("tDep")],[t("date"),new Date(x.at).toLocaleString(S.lang)]].concat(x.k==="plan"?[[t("explore"),flag(x.cc)+" "+cname(x.cc)],[t("hist"),pn(x)]]:[]).concat([[t("amount"),money(Math.abs(x.c))]]);
+ openM(`<h2>${H(t("receipt"))}</h2><div class="list">${rows.map(([k,v])=>`<div class="row" style="min-height:48px;justify-content:space-between"><span class="m2">${H(k)}</span><b>${H(v)}</b></div>`).join("")}</div><button class="btn" data-x>${H(t("close"))}</button>`)}
+paint();
+})();
+</script></body></html>

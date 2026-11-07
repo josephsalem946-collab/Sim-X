@@ -1,0 +1,6 @@
+{
+  "name": "Sim X",
+  "description": "Sim X eSIM mondiale marque blanche avec couverture dans 200+ pays, gestion de solde, forfaits 4G/5G, paiements MonCash, NatCash, Stripe, Crypto et Google Play.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

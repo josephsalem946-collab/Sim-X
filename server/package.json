@@ -1,0 +1,15 @@
+{
+  "name": "simx-payment-proxy",
+  "version": "1.0.0",
+  "description": "Serveur Proxy Sécurisé pour les Passerelles MonCash & Natcash - Sim X",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}
